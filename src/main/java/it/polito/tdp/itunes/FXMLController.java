@@ -1,12 +1,17 @@
 /**
- * Sample Skeleton for 'Scene.fxml' Controller Class
+\ * Sample Skeleton for 'Scene.fxml' Controller Class
  */
 
 package it.polito.tdp.itunes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.itunes.model.Arco;
+import it.polito.tdp.itunes.model.Genre;
 import it.polito.tdp.itunes.model.Model;
+import it.polito.tdp.itunes.model.Track;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -34,10 +39,10 @@ public class FXMLController {
     private Button btnMassimo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCanzone"
-    private ComboBox<?> cmbCanzone; // Value injected by FXMLLoader
+    private ComboBox<Track> cmbCanzone; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbGenere"
-    private ComboBox<?> cmbGenere; // Value injected by FXMLLoader
+    private ComboBox<Genre> cmbGenere; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtMemoria"
     private TextField txtMemoria; // Value injected by FXMLLoader
@@ -52,11 +57,25 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	Genre genere=this.cmbGenere.getValue(); //l'input del grafo lo prendo dalla combobox 
+    	if(genere==null){ //CONTROLLO DA FARE IN CASO IL BOTTONE CREA GRAFO VENISSE PREMUTO SENZA SELEZIONARE IL PARAMETRO
+    		this.txtResult.appendText(" Per favore selezionare un genere \n");
+    		return;
+    	}
+    	model.creaGrafo(genere);
+    	
+    	this.txtResult.appendText("Grafo creato con "+ model.nVertici()+" vertici e "+model.nArchi()+" archi \n ");
 
     }
 
     @FXML
     void doDeltaMassimo(ActionEvent event) {
+    	Genre genere=this.cmbGenere.getValue();
+    	//ovviamente devo prendere di nuovo il parametro dalla combobox, metodi diversi non si ricordano del parametro selezionato   
+    	List<Arco> massimi=this.model.getMassimi(genere);
+    	for(Arco a: massimi) {
+    		this.txtResult.appendText(a+"\n"); //infatti l'oggetto Arco sa già come stamparsi, gliel'ho detto nel toString()
+    	}
     	
     	
     }
@@ -75,6 +94,10 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	//per inserire nella tendina tutti i generi musicali del DB devo prendere dal model 
+    	this.cmbGenere.getItems().addAll(this.model.getGeneri()); //altrimenti potevo fare una lista fuori e passargli quella
+    	
+    	
     }
 
 }
